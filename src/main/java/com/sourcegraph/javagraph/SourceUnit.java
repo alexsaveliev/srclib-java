@@ -60,16 +60,6 @@ public class SourceUnit {
      */
     Map<String, Object> Data = new HashMap<>();
 
-    /**
-     * Source unit ops data
-     */
-    Map<String, String> Ops = new HashMap<>();
-
-    {
-        Ops.put("graph", "graph");
-        Ops.put("depresolve", "depresolve");
-    }
-
     public SourceUnit() {
 
     }
