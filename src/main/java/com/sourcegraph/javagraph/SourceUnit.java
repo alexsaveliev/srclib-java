@@ -66,8 +66,8 @@ public class SourceUnit {
     Map<String, String> Ops = new HashMap<>();
 
     {
-        Ops.put("graphJavaFiles", null);
-        Ops.put("depresolve", null);
+        Ops.put("graph", "graph");
+        Ops.put("depresolve", "depresolve");
     }
 
     public SourceUnit() {
