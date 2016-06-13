@@ -10,10 +10,7 @@ import org.slf4j.LoggerFactory;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 
 /**
  * Extracts build meta information from source unit build file (pom.xml or .gradle)
@@ -122,6 +119,12 @@ public class BuildAnalysis {
         public Collection<SourcePathElement> sourceDirs;
 
         /**
+         * List of directories that contain generated files
+         */
+        public Collection<String> generatedDirs;
+
+
+        /**
          * Classpath used to compile module
          */
         public Collection<String> classPath;
@@ -166,7 +169,8 @@ public class BuildAnalysis {
             attrs = new POMAttrs();
             dependencies = new HashSet<>();
             sources = new HashSet<>();
-            sourceDirs = new ArrayList<>();
+            sourceDirs = new LinkedList<>();
+            generatedDirs = new LinkedList<>();
             classPath = new HashSet<>();
             bootClassPath = new HashSet<>();
             projectDependencies = new HashSet<>();
@@ -360,6 +364,12 @@ public class BuildAnalysis {
                                 String tokens[] = payload.split(":", 4);
                                 String unitName = POMAttrs.groupId(tokens[0]) + '/' + tokens[1];
                                 info.sourceDirs.add(new SourcePathElement(unitName, tokens[2], tokens[3]));
+                                break;
+                            case "SRCLIB-GENERATEDDIR":
+                                if (info == null) {
+                                    continue;
+                                }
+                                info.generatedDirs.add(PathUtil.CWD.resolve(payload).toString());
                                 break;
                             case "SRCLIB-SOURCEVERSION":
                                 if (info == null) {

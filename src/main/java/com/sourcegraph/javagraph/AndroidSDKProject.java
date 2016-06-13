@@ -97,6 +97,11 @@ class AndroidSDKProject implements Project {
         return null;
     }
 
+    @Override
+    public boolean isGenerated(String file) {
+        return false;
+    }
+
     /**
      * Creates source unit from a given directory
      * @return source unit

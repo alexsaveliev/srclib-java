@@ -43,4 +43,9 @@ public class GenericProject implements Project {
         return null;
     }
 
+    @Override
+    public boolean isGenerated(String file) {
+        return false;
+    }
+
 }

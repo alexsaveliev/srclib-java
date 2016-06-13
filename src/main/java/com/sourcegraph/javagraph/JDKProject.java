@@ -114,6 +114,11 @@ public class JDKProject implements Project {
     }
 
     @Override
+    public boolean isGenerated(String file) {
+        return false;
+    }
+
+    @Override
     public RawDependency getDepForJAR(Path jarFile) throws Exception {
         return null;
     }

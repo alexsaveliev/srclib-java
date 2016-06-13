@@ -127,7 +127,12 @@ public class ElementPath {
                     p.toString());
             String name = e.getSimpleName().toString();
             if (name.isEmpty()) {
-                name = "u-" + getUniqueID(e);
+                String id = getUniqueID(e);
+                if (id == null) {
+                    return null;
+                } else {
+                    name = "u-" + id;
+                }
             }
             p.unshift(name);
             return visit(e.getEnclosingElement(), p);

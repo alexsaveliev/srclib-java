@@ -35,7 +35,6 @@ import org.eclipse.aether.spi.connector.transport.TransporterFactory;
 import org.eclipse.aether.transport.file.FileTransporterFactory;
 import org.eclipse.aether.transport.http.HttpTransporterFactory;
 import org.eclipse.aether.util.graph.visitor.PreorderNodeListGenerator;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,6 +50,7 @@ public class MavenProject implements Project {
 
     public static final String SOURCE_CODE_VERSION_PROPERTY = "srclib-source-code-version";
     public static final String SOURCE_CODE_ENCODING_PROPERTY = "srclib-source-code-encoding";
+    public static final String GENERATED_SOURCE_DIRS_PROPERTY = "srclib-generated-source-dirs";
     public static final String ANDROID_PROPERTY = "srclib-android";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MavenProject.class);
@@ -69,6 +69,8 @@ public class MavenProject implements Project {
     private static RepositorySystem repositorySystem;
     private static RepositorySystemSession repositorySystemSession;
 
+    private SubDirectoryFileFilter filter;
+
     static {
         initRepositorySystem();
     }
@@ -76,6 +78,7 @@ public class MavenProject implements Project {
     public MavenProject(SourceUnit unit) {
         this.unit = unit;
         this.pomFile = FileSystems.getDefault().getPath(unit.Data.POMFile).toAbsolutePath();
+        this.filter = new SubDirectoryFileFilter(unit.Data.GeneratedSourcePath);
     }
 
     public MavenProject(Path pomFile) {
@@ -217,6 +220,11 @@ public class MavenProject implements Project {
     }
 
     @Override
+    public boolean isGenerated(String file) {
+        return filter.matches(file);
+    }
+
+    @Override
     public RawDependency getDepForJAR(Path jarFile) {
         for (RawDependency dependency : unit.Data.Dependencies) {
             if (dependency.file != null &&
@@ -246,6 +254,7 @@ public class MavenProject implements Project {
      * @throws IOException
      * @throws ModelBuildingException
      */
+    @SuppressWarnings("unchecked")
     private static BuildAnalysis.BuildInfo createBuildInfo(MavenProject proj)
             throws IOException, ModelBuildingException {
 
@@ -274,6 +283,11 @@ public class MavenProject implements Project {
         Collection<String> sourceRoots = collectSourceRoots(proj.pomFile, proj);
         info.sourceDirs = sourceRoots.stream().map(sourceRoot ->
                 new SourcePathElement(info.getName(), info.version, sourceRoot)).collect(Collectors.toList());
+        info.generatedDirs = (Collection<String>)
+                proj.getMavenProject().getProperties().get(GENERATED_SOURCE_DIRS_PROPERTY);
+        if (info.generatedDirs == null) {
+            info.generatedDirs = new LinkedList<>();
+        }
         info.sources = collectSourceFiles(sourceRoots);
         info.sourceEncoding = proj.getMavenProject().getProperties().getProperty(SOURCE_CODE_ENCODING_PROPERTY);
         info.sourceVersion = proj.getMavenProject().getProperties().getProperty(SOURCE_CODE_VERSION_PROPERTY,
@@ -356,10 +370,12 @@ public class MavenProject implements Project {
                     artifactsByUnitId,
                     unitsByPomFile);
             Set<SourcePathElement> sourcePath = new HashSet<>();
+            Set<String> generatedSourcePath = new HashSet<>();
             Collection<RawDependency> allDependencies = new ArrayList<>();
             for (BuildAnalysis.BuildInfo dependency : dependencies) {
                 allDependencies.addAll(dependency.dependencies);
                 sourcePath.addAll(dependency.sourceDirs);
+                generatedSourcePath.addAll(dependency.generatedDirs);
             }
             Collection<RawDependency> externalDeps = new ArrayList<>();
             // if source unit depends on another source units, let's exclude them from the list before
@@ -391,6 +407,7 @@ public class MavenProject implements Project {
             }
             unit.Data.ClassPath = classPath;
             unit.Data.SourcePath = sourcePath;
+            unit.Data.GeneratedSourcePath = generatedSourcePath;
             if (info.androidSdk != null) {
                 unit.Data.Android = true;
             }

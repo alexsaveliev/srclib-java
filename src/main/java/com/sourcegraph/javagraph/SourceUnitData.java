@@ -56,6 +56,11 @@ public class SourceUnitData {
     Collection<SourcePathElement> SourcePath;
 
     /**
+     * Source path to use
+     */
+    Collection<String> GeneratedSourcePath;
+
+    /**
      * Extra source files (which may be located outside of repo)
      */
     Collection<String> ExtraSourceFiles;

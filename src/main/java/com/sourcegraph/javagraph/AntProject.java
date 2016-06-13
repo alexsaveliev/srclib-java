@@ -117,6 +117,11 @@ public class AntProject implements Project {
     }
 
     @Override
+    public boolean isGenerated(String file) {
+        return false;
+    }
+
+    @Override
     public RawDependency getDepForJAR(Path jarFile) {
         for (RawDependency dependency : unit.Data.Dependencies) {
             if (dependency.file != null &&

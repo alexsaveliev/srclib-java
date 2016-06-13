@@ -49,17 +49,23 @@ public class CodehausTemplatingMavenPlugin extends AbstractMavenPlugin {
         for (PluginExecution pluginExecution : buildHelper.getExecutions()) {
             Object configuration = pluginExecution.getConfiguration();
             if (configuration == null || !(configuration instanceof Xpp3Dom)) {
-                project.getCompileSourceRoots().add(PathUtil.concat(project.getModel().getProjectDirectory(),
-                        "src/main/java-templates").getPath());
+                String dir = PathUtil.concat(project.getModel().getProjectDirectory(),
+                        "src/main/java-templates").getPath();
+                project.getCompileSourceRoots().add(dir);
+                addGeneratedSourceDir(project, dir);
                 continue;
             }
             Xpp3Dom xmlConfiguration = (Xpp3Dom) configuration;
             Xpp3Dom sourceDirDom = xmlConfiguration.getChild("sourceDirectory");
             if (sourceDirDom == null) {
-                project.getCompileSourceRoots().add(PathUtil.concat(project.getModel().getProjectDirectory(),
-                        "src/main/java-templates").getPath());
+                String dir = PathUtil.concat(project.getModel().getProjectDirectory(),
+                        "src/main/java-templates").getPath();
+                project.getCompileSourceRoots().add(dir);
+                addGeneratedSourceDir(project, dir);
             } else {
-                project.getCompileSourceRoots().add(PathUtil.CWD.resolve(sourceDirDom.getValue()).toString());
+                String dir = PathUtil.CWD.resolve(sourceDirDom.getValue()).toString();
+                project.getCompileSourceRoots().add(dir);
+                addGeneratedSourceDir(project, dir);
             }
         }
     }

@@ -32,8 +32,11 @@ public class GradleProject implements Project {
      */
     private static Map<String, BuildAnalysis.BuildInfo> unitCache = new HashMap<>();
 
+    private SubDirectoryFileFilter filter;
+
     public GradleProject(SourceUnit unit) {
         this.unit = unit;
+        this.filter = new SubDirectoryFileFilter(unit.Data.GeneratedSourcePath);
     }
 
     /**
@@ -120,6 +123,11 @@ public class GradleProject implements Project {
     @Override
     public String getSourceCodeEncoding() {
         return unit.Data.SourceEncoding;
+    }
+
+    @Override
+    public boolean isGenerated(String file) {
+        return filter.matches(file);
     }
 
     @Override
@@ -363,6 +371,7 @@ public class GradleProject implements Project {
             Collection<String> classpathSet = new HashSet<>();
 
             List<SourcePathElement> sourcepath = new LinkedList<>();
+            List<String> generatedSourcepath = new LinkedList<>();
             for (BuildAnalysis.BuildInfo info : infos) {
                 classpathSet.addAll(info.classPath);
                 classpathSet.addAll(info.dependencies.stream().filter(dependency ->
@@ -378,10 +387,12 @@ public class GradleProject implements Project {
                                 path));
                     }
                 }
+                generatedSourcepath.addAll(info.generatedDirs);
             }
 
             unit.Data.ClassPath = classpathSet;
             unit.Data.SourcePath = sourcepath;
+            unit.Data.GeneratedSourcePath = generatedSourcepath;
         }
     }
 

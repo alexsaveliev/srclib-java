@@ -21,7 +21,7 @@ public interface Project {
      * Null or empty list indicate absence of classpath to use
      * @throws Exception
      */
-    public Collection<String> getClassPath() throws Exception;
+    Collection<String> getClassPath() throws Exception;
 
     /**
      * @return list of bootstrap classpath elements to be passed to javac -Xbootclasspath command line argument.
@@ -30,14 +30,14 @@ public interface Project {
      * (for example, when you are compiling JDK source code)
      * @throws Exception
      */
-    public Collection<String> getBootClassPath() throws Exception;
+    Collection<String> getBootClassPath() throws Exception;
 
     /**
      * @return list of directories where javac should look for java files (matches javac's -sourcepath). Each element
      * should denote existing directory, either absolute or relative to source unit directory.
      * @throws Exception
      */
-    public Collection<String> getSourcePath() throws Exception;
+    Collection<String> getSourcePath() throws Exception;
 
     /**
      * Translates path to JAR file to raw dependency if possible
@@ -45,7 +45,7 @@ public interface Project {
      * @return raw dependency matching given JAR file if possible to identify or null
      * @throws Exception
      */
-    public RawDependency getDepForJAR(Path jarFile) throws Exception;
+    RawDependency getDepForJAR(Path jarFile) throws Exception;
 
     /**
      *
@@ -53,7 +53,7 @@ public interface Project {
      * source code version is not taken into account
      * @throws Exception
      */
-    public String getSourceCodeVersion() throws Exception;
+    String getSourceCodeVersion() throws Exception;
 
     /**
      *
@@ -61,5 +61,11 @@ public interface Project {
      * source code encoding is not taken into account and platform-dependent encoding is used
      * @throws Exception
      */
-    public String getSourceCodeEncoding() throws Exception;
+    String getSourceCodeEncoding() throws Exception;
+
+    /**
+     * @param file file to check
+     * @return true if file was generated at the build step and defs from/refs to this file should not be emitted
+     */
+    public boolean isGenerated(String file);
 }

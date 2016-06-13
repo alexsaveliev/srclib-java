@@ -151,6 +151,30 @@ def collectBuildableDependencies(project, task, dependency, target) {
     }
 }
 
+def listAndroidSourceFiles(project, name) {
+    if (project.tasks.hasProperty(name)) {
+    	Task t = project.tasks[name]
+        listSourceFiles(t)
+        println "SRCLIB-CLASSPATH $t.classpath.asPath"
+    }
+}
+
+def listAndroidGeneratedDirectories(project, variant) {
+	variant = "Debug" + variant
+	listAndroidGeneratedDirectory(project, "compile" + variant + "Aidl")
+	listAndroidGeneratedDirectory(project, "generate" + variant + "BuildConfig")
+	listAndroidGeneratedDirectory(project, "process" + variant + "Resources")
+}
+
+def listAndroidGeneratedDirectory(project, name) {
+	if (project.tasks.hasProperty(name)) {
+		Task t = project.tasks[name]
+		if (t.hasProperty("sourceOutputDir")) {
+			println "SRCLIB-GENERATEDDIR $t.sourceOutputDir"
+		}
+	}
+}
+
 class SrclibPrintStream extends PrintStream {
     SrclibPrintStream() {
         super(System.err);
@@ -297,30 +321,16 @@ allprojects {
                     }
                 }
 
-                if (project.tasks.hasProperty("compileDebugJava")) {
-                    listSourceFiles(project.tasks.compileDebugJava)
-                    println "SRCLIB-CLASSPATH $project.tasks.compileDebugJava.classpath.asPath"
-                }
-                if (project.tasks.hasProperty("compileDebugUnitTestJava")) {
-                    listSourceFiles(project.tasks.compileDebugUnitTestJava)
-                    println "SRCLIB-CLASSPATH $project.tasks.compileDebugUnitTestJava.classpath.asPath"
-                }
-                if (project.tasks.hasProperty("compileDebugJavaWithJavac")) {
-                    listSourceFiles(project.tasks.compileDebugJavaWithJavac)
-                    println "SRCLIB-CLASSPATH $project.tasks.compileDebugJavaWithJavac.classpath.asPath"
-                }
-                if (project.tasks.hasProperty("compileDebugUnitTestJavaWithJavac")) {
-                    listSourceFiles(project.tasks.compileDebugUnitTestJavaWithJavac)
-                    println "SRCLIB-CLASSPATH $project.tasks.compileDebugUnitTestJavaWithJavac.classpath.asPath"
-                }
-                if (project.tasks.hasProperty("compileDebugAndroidTestJava")) {
-                    listSourceFiles(project.tasks.compileDebugAndroidTestJava)
-                    println "SRCLIB-CLASSPATH $project.tasks.compileDebugAndroidTestJava.classpath.asPath"
-                }
-                if (project.tasks.hasProperty("compileDebugAndroidTestJavaWithJavac")) {
-                    listSourceFiles(project.tasks.compileDebugAndroidTestJavaWithJavac)
-                    println "SRCLIB-CLASSPATH $project.tasks.compileDebugAndroidTestJavaWithJavac.classpath.asPath"
-                }
+                listAndroidSourceFiles(project, "compileDebugJava")
+                listAndroidSourceFiles(project, "compileDebugUnitTestJava")
+                listAndroidSourceFiles(project, "compileDebugAndroidTestJava")
+                listAndroidSourceFiles(project, "compileDebugJavaWithJavac")
+                listAndroidSourceFiles(project, "compileDebugUnitTestJavaWithJavac")
+                listAndroidSourceFiles(project, "compileDebugAndroidTestJavaWithJavac")
+
+                listAndroidGeneratedDirectories(project, "")
+                listAndroidGeneratedDirectories(project, "UnitTest")
+                listAndroidGeneratedDirectories(project, "AndroidTest")
             }
 
         }
@@ -390,3 +400,4 @@ allprojects {
     }
 
 }
+

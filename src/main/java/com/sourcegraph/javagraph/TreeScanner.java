@@ -19,10 +19,10 @@ import javax.lang.model.element.Modifier;
 import javax.lang.model.type.TypeMirror;
 import javax.tools.Diagnostic;
 import javax.tools.JavaFileObject;
-import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.*;
+import java.util.List;
+import java.util.Stack;
 import java.util.stream.Collectors;
 
 /**
@@ -50,13 +50,9 @@ class TreeScanner extends TreePathScanner<Void, Void> {
 
     private final GraphWriter emit;
     private final SourceUnit unit;
+    private final Project project;
 
     private final SourcePositions srcPos;
-    // We sometimes emit defs or refs multiple times because Spans will
-    // output a ref that we've already visited normally. I don't know why we
-    // emit duplicate defs.
-    private final Set<DefKey> seenDefs = new HashSet<>();
-    private final Set<Ref> seenRefs = new HashSet<>();
     private Spans spans;
 
     CompilationUnitTree compilationUnit;
@@ -79,6 +75,7 @@ class TreeScanner extends TreePathScanner<Void, Void> {
         this.srcPos = trees.getSourcePositions();
         this.trees = trees;
         this.unit = unit;
+        this.project = unit.getProject();
     }
 
     /**
@@ -116,14 +113,7 @@ class TreeScanner extends TreePathScanner<Void, Void> {
         r.end = span[1];
         r.def = def;
 
-        if (seenRefs.contains(r))
-            return;
-        seenRefs.add(r);
-        try {
-            emit.writeRef(r);
-        } catch (IOException e) {
-            LOGGER.warn("I/O error", e);
-        }
+        emit.writeRef(r);
     }
 
     /**
@@ -153,10 +143,6 @@ class TreeScanner extends TreePathScanner<Void, Void> {
             return null;
         }
 
-        if (seenDefs.contains(s.defKey))
-            return null;
-        seenDefs.add(s.defKey);
-
         Element current = currentElement();
         s.name = current.getSimpleName().toString();
         s.kind = current.getKind().toString();
@@ -176,12 +162,7 @@ class TreeScanner extends TreePathScanner<Void, Void> {
         s.modifiers = modifiers;
         s.doc = trees.getDocComment(getCurrentPath());
 
-        try {
-            emit.writeDef(s);
-        } catch (IOException e) {
-            LOGGER.warn("I/O error", e);
-        }
-        return s;
+        return emit.writeDef(s);
     }
 
     private boolean verbose = false;

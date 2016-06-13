@@ -1,7 +1,5 @@
 package com.sourcegraph.javagraph;
 
-import java.io.IOException;
-
 /**
  * This interface is responsible for collecting and writing references and definitions produced by grapher
  */
@@ -10,20 +8,19 @@ public interface GraphWriter {
     /**
      * Writes reference
      * @param r reference to write
-     * @throws IOException
+     * @return ref written (may be null if this ref is already written)
      */
-    void writeRef(Ref r) throws IOException;
+    Ref writeRef(Ref r);
 
     /**
      * Writes definition
-     * @param s definition to write
-     * @throws IOException
+     * @param def definition to write
+     * @return def written (may be null if this def is already written)
      */
-    void writeDef(Def s) throws IOException;
+    Def writeDef(Def def);
 
     /**
      * Flush underlying streams
-     * @throws IOException
      */
-    void flush() throws IOException;
+    void flush();
 }

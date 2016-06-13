@@ -31,6 +31,7 @@ public class Grapher {
     private final List<String> javacOpts;
 
     private final SourceUnit unit;
+    private final Project project;
 
     /**
      * Constructs new grapher object
@@ -42,6 +43,7 @@ public class Grapher {
                    GraphWriter emit) throws Exception {
         this.unit = unit;
         this.emit = emit;
+        this.project = unit.getProject();
 
         compiler = ToolProvider.getSystemJavaCompiler();
         diags = new DiagnosticCollector<>();
@@ -49,7 +51,7 @@ public class Grapher {
 
         javacOpts = new ArrayList<>();
 
-        Collection<String> bootClassPath = unit.getProject().getBootClassPath();
+        Collection<String> bootClassPath = project.getBootClassPath();
         if (bootClassPath == null) {
             String envBootClasspath = System.getProperty("sun.boot.class.path");
             if (StringUtils.isEmpty(envBootClasspath)) {
@@ -69,7 +71,7 @@ public class Grapher {
         fileManager.setLocation(StandardLocation.PLATFORM_CLASS_PATH, bootClassPathFiles);
         javacOpts.add("-Xbootclasspath:" + StringUtils.join(resolvedBootClassPath, SystemUtils.PATH_SEPARATOR));
 
-        Collection<String> classPath = unit.getProject().getClassPath();
+        Collection<String> classPath = project.getClassPath();
         if (classPath == null) {
             classPath = Collections.emptyList();
         }
@@ -85,7 +87,7 @@ public class Grapher {
         javacOpts.add("-classpath");
         javacOpts.add(StringUtils.join(resolvedClassPath, SystemUtils.PATH_SEPARATOR));
 
-        Collection<String> sourcePath = unit.getProject().getSourcePath();
+        Collection<String> sourcePath = project.getSourcePath();
         if (sourcePath != null && !sourcePath.isEmpty()) {
             javacOpts.add("-sourcepath");
             Collection<String> resolvedSourcePath = new ArrayList<>();
@@ -104,7 +106,7 @@ public class Grapher {
         javacOpts.add("-XDshouldStopPolicyIfError=ATTR");
         javacOpts.add("-XDshouldStopPolicyIfNoError=ATTR");
 
-        String sourceVersion = unit.getProject().getSourceCodeVersion();
+        String sourceVersion = project.getSourceCodeVersion();
         if (!StringUtils.isEmpty(sourceVersion)) {
             javacOpts.add("-source");
             javacOpts.add(sourceVersion);
@@ -115,7 +117,7 @@ public class Grapher {
         // turn off warnings
         javacOpts.add("-Xlint:none");
 
-        String sourceEncoding = unit.getProject().getSourceCodeEncoding();
+        String sourceEncoding = project.getSourceCodeEncoding();
         if (!StringUtils.isEmpty(sourceEncoding)) {
             javacOpts.add("-encoding");
             javacOpts.add(sourceEncoding);
@@ -199,11 +201,12 @@ public class Grapher {
             Iterable<? extends CompilationUnitTree> units = task.parse();
             task.analyze();
             for (final CompilationUnitTree unit : units) {
-
                 try {
                     ExpressionTree pkgName = unit.getPackageName();
-                    if (pkgName != null && !seenPackages.contains(pkgName.toString()) &&
-                            (isPackageInfo(unit) || !hasPackageInfo(pkgName.toString(), files))) {
+                    if (pkgName != null &&
+                            !seenPackages.contains(pkgName.toString()) &&
+                            (isPackageInfo(unit) || !hasPackageInfo(pkgName.toString(), files)) &&
+                            !project.isGenerated(unit.getSourceFile().getName())) {
                         seenPackages.add(pkgName.toString());
                         writePackageSymbol(pkgName, unit, trees);
                     }

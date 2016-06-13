@@ -44,6 +44,8 @@ public class SourceUnit extends Key {
      */
     SourceUnitData Data = new SourceUnitData();
 
+    private Project project;
+
     public SourceUnit() {
 
     }
@@ -51,29 +53,26 @@ public class SourceUnit extends Key {
     /**
      * @return project (aka compiler settings) based on source unit data
      */
-    // TODO(rameshvarun): Info field
     public Project getProject() {
-        if (MavenProject.is(this)) {
-            return new MavenProject(this);
+        if (project == null) {
+            if (MavenProject.is(this)) {
+                project = new MavenProject(this);
+            } else if (GradleProject.is(this)) {
+                project = new GradleProject(this);
+            } else if (AntProject.is(this)) {
+                project = new AntProject(this);
+            } else if (AndroidSDKProject.is(this)) {
+                project = new AndroidSDKProject(this);
+            } else if (AndroidSupportProject.is(this)) {
+                project = new AndroidSupportProject(this);
+            } else if (AndroidCoreProject.is(this)) {
+                project = new AndroidCoreProject(this);
+            } else if (JDKProject.is(this)) {
+                project = new JDKProject(this);
+            } else {
+                project = new GenericProject(this);
+            }
         }
-        if (GradleProject.is(this)) {
-            return new GradleProject(this);
-        }
-        if (AntProject.is(this)) {
-            return new AntProject(this);
-        }
-        if (AndroidSDKProject.is(this)) {
-            return new AndroidSDKProject(this);
-        }
-        if (AndroidSupportProject.is(this)) {
-            return new AndroidSupportProject(this);
-        }
-        if (AndroidCoreProject.is(this)) {
-            return new AndroidCoreProject(this);
-        }
-        if (JDKProject.is(this)) {
-            return new JDKProject(this);
-        }
-        return new GenericProject(this);
+        return project;
     }
 }

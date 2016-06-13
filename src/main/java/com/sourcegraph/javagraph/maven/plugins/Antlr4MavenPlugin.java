@@ -41,7 +41,9 @@ public class Antlr4MavenPlugin extends AbstractMavenPlugin {
                       File repoDir) {
         // Let's create generated source files from ANTLR grammar
         runMavenGoal(project.getModel().getPomFile(), repoDir, "generate-sources");
-        project.getCompileSourceRoots().add(getGeneratedSourceDirectory(project));
+        String dir = getGeneratedSourceDirectory(project);
+        project.getCompileSourceRoots().add(dir);
+        addGeneratedSourceDir(project, dir);
     }
 
     /**

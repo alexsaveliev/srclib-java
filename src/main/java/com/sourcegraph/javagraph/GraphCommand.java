@@ -35,7 +35,6 @@ public class GraphCommand {
     public void Execute() {
 
         final Graph graph = new Graph(); // Final graphJavaFiles object that is serialized to stdout
-        final GraphData rawGraph = new GraphData(); // Raw graphJavaFiles from the tree traversal
         Reader r = null;
         try {
             if (!StringUtils.isEmpty(debugUnitFile)) {
@@ -55,10 +54,10 @@ public class GraphCommand {
         LOGGER.info("Building graph for {}", unit.Name);
 
         Project proj = unit.getProject();
+        final NormalizedGraphWriter writer = new NormalizedGraphWriter(proj);
         Resolver rs = new Resolver(proj, unit);
         try {
-            Grapher grapher = new Grapher(unit,
-                    rawGraph);
+            Grapher grapher = new Grapher(unit, writer);
             LOGGER.debug("Starting graph collection");
             Collection<String> files = new ArrayList<>();
             if (unit.Files != null) {
@@ -74,21 +73,25 @@ public class GraphCommand {
             grapher.close();
 
             LOGGER.debug("Collecting defs");
-            graph.Defs = rawGraph.defs;
-            for (Def def : rawGraph.defs) {
+            graph.Defs = writer.defs;
+            for (Def def : writer.defs) {
                 // Ignore empty docstrings.
                 if (def.doc != null) {
                     graph.Docs.add(new Doc(def));
                 }
             }
             LOGGER.debug("Collecting refs");
-            for (Ref ref : rawGraph.refs) {
+            Iterator<Ref> refs = writer.refs.iterator();
+            while (refs.hasNext()) {
+                Ref ref = refs.next();
                 ResolvedTarget target = rs.resolveOrigin(ref.defKey.getOrigin());
                 if (target != null) {
                     ref.setDefTarget(target);
                 }
+                if (!writer.isGenerated(ref)) {
+                    graph.Refs.add(ref);
+                }
             }
-            graph.Refs = rawGraph.refs;
         } catch (Exception e) {
             LOGGER.error("Unexpected error occurred while building graph", e);
             System.exit(1);
@@ -162,8 +165,8 @@ public class GraphCommand {
      * Graph object that keeps definitions, references, and docs
      */
     static class Graph {
-        List<Def> Defs = new LinkedList<>();
-        List<Ref> Refs = new LinkedList<>();
-        List<Doc> Docs = new LinkedList<>();
+        Collection<Def> Defs;
+        Collection<Ref> Refs = new LinkedList<>();
+        Collection<Doc> Docs = new LinkedList<>();
     }
 }

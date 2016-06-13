@@ -43,6 +43,7 @@ public class SimpligilityAndroidMavenPlugin extends AbstractMavenPlugin {
         String sourceRoot = getGeneratedSourceDirectory(project);
         LOGGER.debug("Registering source root {}", sourceRoot);
         project.getCompileSourceRoots().add(sourceRoot);
+        addGeneratedSourceDir(project, sourceRoot);
         project.getProperties().setProperty(com.sourcegraph.javagraph.MavenProject.ANDROID_PROPERTY, StringUtils.EMPTY);
     }
 

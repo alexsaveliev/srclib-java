@@ -62,7 +62,10 @@ public class CodehausBuildHelperMavenPlugin extends AbstractMavenPlugin {
                     continue;
                 }
                 for (Xpp3Dom source : sourceList) {
-                    project.getCompileSourceRoots().add(PathUtil.CWD.resolve(source.getValue()).toString());
+                    String dir = PathUtil.CWD.resolve(source.getValue()).toString();
+                    project.getCompileSourceRoots().add(dir);
+                    addGeneratedSourceDir(project, dir);
+
                 }
             }
         }

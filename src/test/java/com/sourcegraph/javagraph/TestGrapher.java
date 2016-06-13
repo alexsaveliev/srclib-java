@@ -50,6 +50,11 @@ public class TestGrapher {
                     public String getSourceCodeEncoding() throws Exception {
                         return null;
                     }
+
+                    @Override
+                    public boolean isGenerated(String file) {
+                        return false;
+                    }
                 };
             }
         };

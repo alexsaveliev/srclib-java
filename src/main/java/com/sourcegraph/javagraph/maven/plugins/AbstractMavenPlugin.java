@@ -11,6 +11,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -159,6 +161,23 @@ public abstract class AbstractMavenPlugin implements MavenPlugin {
             }
         }
         return mavenCmd;
+    }
+
+    /**
+     * Adds directory containing generated source code to project
+     * @param project project to add generated source code dir marker to
+     * @param dir directory to add
+     */
+    @SuppressWarnings("unchecked")
+    protected void addGeneratedSourceDir(MavenProject project, String dir) {
+        Collection generatedSourceDirs = (Collection)
+                project.getProperties().get(com.sourcegraph.javagraph.MavenProject.GENERATED_SOURCE_DIRS_PROPERTY);
+        if (generatedSourceDirs == null) {
+            generatedSourceDirs = new LinkedList();
+            project.getProperties().put(com.sourcegraph.javagraph.MavenProject.GENERATED_SOURCE_DIRS_PROPERTY,
+                    generatedSourceDirs);
+        }
+        generatedSourceDirs.add(dir);
     }
 
 

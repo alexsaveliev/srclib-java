@@ -75,6 +75,11 @@ class AndroidCoreProject implements Project {
         return Charsets.UTF_8.name();
     }
 
+    @Override
+    public boolean isGenerated(String file) {
+        return false;
+    }
+
     /**
      * Creates source unit from a given directory
      * @return source unit

@@ -130,6 +130,16 @@ public class ScanCommand {
                         sorted(sourcePathComparator).
                         collect(Collectors.toList());
             }
+            if (unit.Data.GeneratedSourcePath != null) {
+                if (unit.Data.GeneratedSourcePath.isEmpty()) {
+                    unit.Data.GeneratedSourcePath = null;
+                } else {
+                    unit.Data.GeneratedSourcePath = unit.Data.GeneratedSourcePath.stream().
+                            map(PathUtil::relativizeCwd).
+                            sorted().
+                            collect(Collectors.toList());
+                }
+            }
         }
     }
 
