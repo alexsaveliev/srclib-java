@@ -19,7 +19,7 @@
       "UnitType": "JavaArtifact",
       "Unit": "foobar/java-ident-issue-23",
       "Path": "x/Foo/:init",
-      "Name": "\u003cinit\u003e",
+      "Name": "Foo",
       "Kind": "func",
       "File": "src/main/java/x/Foo.java",
       "DefStart": 25,

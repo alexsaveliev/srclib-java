@@ -19,7 +19,7 @@
       "UnitType": "JavaArtifact",
       "Unit": "BuildTools",
       "Path": "build/tools/addjsum/AddJsum/:init",
-      "Name": "\u003cinit\u003e",
+      "Name": "AddJsum",
       "Kind": "func",
       "File": "make/src/classes/build/tools/AddJsum.java",
       "DefStart": 1489,

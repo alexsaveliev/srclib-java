@@ -19,7 +19,7 @@
       "UnitType": "JavaArtifact",
       "Unit": "com.sourcegraph/tweedledee-tweedledum",
       "Path": "com/sourcegraph/Main/:init",
-      "Name": "\u003cinit\u003e",
+      "Name": "Main",
       "Kind": "func",
       "File": "src/main/java/com/sourcegraph/Main.java",
       "DefStart": 39,

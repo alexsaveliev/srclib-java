@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
+import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.type.TypeMirror;
 import javax.tools.Diagnostic;
@@ -144,7 +145,14 @@ class TreeScanner extends TreePathScanner<Void, Void> {
         }
 
         Element current = currentElement();
-        s.name = current.getSimpleName().toString();
+        if (current == null) {
+            return null;
+        }
+        if (current.getKind() == ElementKind.CONSTRUCTOR) {
+            s.name = current.getEnclosingElement().getSimpleName().toString();
+        } else {
+            s.name = current.getSimpleName().toString();
+        }
         s.kind = current.getKind().toString();
         if (nameSpan != null) {
             s.identStart = nameSpan[0];

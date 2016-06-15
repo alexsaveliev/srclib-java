@@ -80,7 +80,7 @@ func (f defFormatter) Name(qual graph.Qualification) string {
 
 func (f defFormatter) Type(qual graph.Qualification) string {
 	switch f.data.JavaKind {
-	case "CLASS", "INTERFACE", "ENUM", "PACKAGE":
+	case "CLASS", "INTERFACE", "ENUM", "PACKAGE", "CONSTRUCTOR":
 		return ""
 	default:
 		return strings.Replace(strings.Replace(f.data.TypeExpression, ",", ", ", -1), ")", ") ", -1)

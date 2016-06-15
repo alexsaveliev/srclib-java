@@ -19,7 +19,7 @@
       "UnitType": "JavaArtifact",
       "Unit": "default-group/java-android-gradle-sample",
       "Path": "de/goddchen/android/gradle/helloworld/MainActivity/:init",
-      "Name": "\u003cinit\u003e",
+      "Name": "MainActivity",
       "Kind": "func",
       "File": "src/main/java/de/goddchen/android/gradle/helloworld/MainActivity.java",
       "DefStart": 143,
