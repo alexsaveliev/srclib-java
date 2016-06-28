@@ -318,6 +318,23 @@
         "Modifiers": []
       },
       "TreePath": "org/srclib/java/JDK8062359:type/main:java.lang.String[]/args"
+    },
+    {
+      "UnitType": "JavaArtifact",
+      "Unit": "org.srclib.srclib-java/unresolved-maven-deps",
+      "Path": "u-null/test",
+      "Name": "test",
+      "Kind": "func",
+      "File": "unresolved-maven-deps/src/main/java/org/srclib/java/JDK8062359.java",
+      "DefStart": 138,
+      "DefEnd": 200,
+      "Data": {
+        "JavaKind": "METHOD",
+        "TypeExpression": "()void",
+        "Package": "org.srclib.java",
+        "Modifiers": []
+      },
+      "TreePath": "u-null/test"
     }
   ],
   "Refs": [
@@ -862,6 +879,14 @@
       "File": "unresolved-maven-deps/src/main/java/org/srclib/java/JDK8062359.java",
       "Start": 39,
       "End": 49
+    },
+    {
+      "DefPath": "u-null/test",
+      "Unit": "org.srclib.srclib-java/unresolved-maven-deps",
+      "Def": true,
+      "File": "unresolved-maven-deps/src/main/java/org/srclib/java/JDK8062359.java",
+      "Start": 143,
+      "End": 147
     }
   ],
   "Docs": [
