@@ -263,18 +263,6 @@ public class Resolver {
             return resolution;
         }
 
-        // HACK: Assume that if groupID of the RawDependency equals the groupID
-        // of the current project, then it is from the same repo and shouldn't be resolved externally.
-        if (StringUtils.substringBefore(unit.Name, "/").equals(groupId)) {
-            ResolvedTarget target = new ResolvedTarget();
-            target.ToUnit = groupId + '/' + d.artifactID;
-            target.ToUnitType = DEFAULT_TYPE;
-            target.ToVersionString = d.version;
-            resolution = new DepResolution(d, target);
-            depsCache.put(key, resolution);
-            return resolution;
-        }
-
         Result result = getOverride(groupId + '/' + d.artifactID);
         if (result != null && result.unit == null) {
             result.unit = groupId + '/' + d.artifactID;
@@ -320,6 +308,24 @@ public class Resolver {
         }
 
         if (res.Error != null) {
+
+            // HACK: Assume that if groupID of the RawDependency equals the groupID
+            // of the current project, then it is from the same repo and shouldn't be resolved externally.
+            // (alexsaveliev) moved this hack here because there might be a case when
+            // group id matches current one's
+            // but artifact refers to the external one, for example see
+            // https://github.com/sourcegraph/srclib-java/issues/82 where
+            // com.uber.sdk/core-android refers to com.uber.sdk/rides
+            if (StringUtils.substringBefore(unit.Name, "/").equals(groupId)) {
+                ResolvedTarget target = new ResolvedTarget();
+                target.ToUnit = groupId + '/' + d.artifactID;
+                target.ToUnitType = DEFAULT_TYPE;
+                target.ToVersionString = d.version;
+                resolution = new DepResolution(d, target);
+                depsCache.put(key, resolution);
+                return resolution;
+            }
+
             // TODO (alexsaveliev) should we consider this situation as a warning or a normal one?
             LOGGER.info("Unable to resolve dependency {} - {}", d, res.Error);
         }
